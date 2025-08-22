@@ -14,6 +14,10 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	phone, _ := reader.ReadString('\n')
 	phone = strings.TrimSpace(phone)
-	result := lookup.LookupPhoneNumber(phone)
+	result, err := lookup.LookupPhoneNumber(phone)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
 	fmt.Println(result)
 }

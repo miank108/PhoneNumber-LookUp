@@ -1,6 +1,8 @@
 package lookup
 
 import (
+	"errors"
+	"phonenumberlookup/models"
 	"regexp"
 )
 
@@ -10,19 +12,19 @@ func isValidPhoneNumber(number string) bool {
 	return re.MatchString(number)
 }
 
-var phoneBook = map[string]string{
-	"123-456-7890": "Alice",
-	"999-090-8888": "Bob",
-	"000-232-9999": "Charlie",
-	"555-123-4567": "David",
+var phoneBook = map[string]models.PhoneNumber{
+	"123-456-7890": {Number: "123-456-7890", Name: "Alice", Country: "USA", Type: "mobile"},
+	"999-090-8888": {Number: "999-090-8888", Name: "Bob", Country: "Canada", Type: "landline"},
+	"000-232-9999": {Number: "000-232-9999", Name: "Charlie", Country: "UK", Type: "mobile"},
+	"555-123-4567": {Number: "555-123-4567", Name: "David", Country: "India", Type: "landline"},
 }
 
-func LookupPhoneNumber(number string) string {
+func LookupPhoneNumber(number string) (*models.PhoneNumber, error) {
 	if !isValidPhoneNumber(number) {
-		return "Invalid phone number format"
+		return nil, errors.New("Invalid phone number format")
 	}
-	if name, found := phoneBook[number]; found {
-		return "Found: " + name
+	if info, found := phoneBook[number]; found {
+		return &info, nil
 	}
-	return "Phone number not found"
+	return nil, errors.New("Phone number not found")
 }
