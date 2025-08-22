@@ -1,23 +1,22 @@
 package main
 
 import (
-	"bufio"
+	"encoding/json"
 	"fmt"
-	"os"
-	"phonenumberlookup/lookup"
-	"strings"
+	"net/http"
+
+	"phonenumberlookup/internal/service"
 )
 
 func main() {
-	fmt.Println("Phone Number Lookup")
-	fmt.Print("Enter a phone number (format: 123-456-7890): ")
-	reader := bufio.NewReader(os.Stdin)
-	phone, _ := reader.ReadString('\n')
-	phone = strings.TrimSpace(phone)
-	result, err := lookup.LookupPhoneNumber(phone)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-	fmt.Println(result)
+	http.HandleFunc("/v1/phone-numbers", func(w http.ResponseWriter, r *http.Request) {
+		phoneNumber := r.URL.Query().Get("phoneNumber")
+		countryCode := r.URL.Query().Get("countryCode")
+		resp, _ := service.ParsePhoneNumber(phoneNumber, countryCode)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+	})
+
+	fmt.Println("Starting server on :8080")
+	http.ListenAndServe(":8080", nil)
 }
